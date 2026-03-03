@@ -1,0 +1,77 @@
+INSERT INTO customers (full_name, email,address,phone) values
+('Juan Perez','juan.perez@mail.com','Calle 123 #45-67 Bogota',3001234567),
+('Maria Rodriguez'	,'maria.rod@gmail.com'	,'Cra 80 #10-20 Medellin'	,3109876543),
+('Carlos Gomez'	,'carlos.g@hotmail.com'	,'Av Siempre Viva 123 Cali'	,3205551234),
+('Ana Torres'	,'ana.torres@outlook.com'	,'Diag 50 #20-10 Barranquilla'	,3004445566),
+('Pedro Martinez'	,'pedro.martinez@yahoo.com'	,'Calle 100 #15-20 Bogota'	,3151112233),
+('Luisa Fernandez'	,'luisa.fer@gmail.com'	,'Tv 4 #5-12 Bucaramanga'	,3169998877),
+('Jorge Ramirez'	,'jorge.r@empresa.com'	,'Cra 7 #72-10 Bogota'	,3112223344),
+('Sofia Vergara'	,'sofia.v@cine.com'	,'Calle 10 #10-10 Cartagena'	,3007776655);
+
+INSERT INTO categories(name) values
+('Electronics'),
+('Accessories'),
+('Home');
+
+INSERT INTO suppliers(name,contact) values
+('TechDistro SAS',	'ventas@techdistro.com'),
+('Accesorios Total',	'contacto@accesoriostotal.com'),
+('MueblesYa',	'info@mueblesya.com'),
+('GamerZone',	'sales@gamerzone.co'),
+('IluminaTodo',	'ventas@iluminatodo.co'),
+('soundWave Ltd',	'contact@soundwave.com');
+
+
+
+INSERT INTO products(category_id,sku,name,supplier_id) values
+(1	,'LPT-HP-001'	,'Laptop HP Pavilion', 1),
+(2,	'MSE-LOG-001'	,'Mouse Logitech G203'	,2),
+(2,	'USB-KIN-64'	,'USB Kingston 64GB'	,2),
+(3,	'CHR-ERG-005'	,'Silla Ergonomica Office'	,3),
+(1,	'MON-SAM-24'	,'Monitor Samsung 24'	,1),
+(2,	'KBD-MEC-002'	,'Teclado Mecanico Redragon'	,4),
+(3,	'DSK-STD-100'	,'Escritorio Estandar Blanco'	,3),
+(3,	'LMP-LED-001'	,'Lampara LED Escritorio'	,5),
+(3,	'HDP-SNY-005'	,'Audifonos Sony WH-1000'	,6),
+(1,	'TAB-APP-009'	,'iPad Air 64GB' ,1),
+(2,	'CS-TAB-009'	,'Funda iPad Air'	,2);
+
+
+
+
+INSERT INTO orders(transaction_id,order_date,customer_id) values
+('TXN-1001',	'2024-01-15',	7),
+('TXN-1001',	'2024-01-15',	7),
+('TXN-1001',	'2024-01-15',	7),
+('TXN-1002',	'2024-01-15',	8),
+('TXN-1003',	'2024-01-16',	9),
+('TXN-1003',	'2024-01-16',	9),
+('TXN-1004',	'2024-01-16',	10),
+('TXN-1004',	'2024-01-16',	10),
+('TXN-1005',	'2024-01-17',	11),
+('TXN-1005',	'2024-01-17',	11),
+('TXN-1006',	'2024-01-18',	12),
+('TXN-1006',	'2024-01-18',	12),
+('TXN-1006',	'2024-01-18',	12),
+('TXN-1007',	'2024-01-19',	13);
+select o.id,p.name  from orders o
+select * from products;
+select * from customers
+select * from order_items
+
+INSERT INTO order_items(order_id,product_id,unit_price,quantity) values
+(1,1,3500000	,1),
+(2,2,120000	,2),
+(3,3,45000	,1),
+(4,4,450000	,1),
+(5,5,600000	,2),
+(6,6,250000	,1),
+(7,7,320000	,1),
+(8,8,80000	,3),
+(9,1,3500000	,1),
+(10,9,1200000	,1),
+(11,2,120000	,1),
+(12,10,2800000	,1),
+(13,11,90000	,1);
+
+
