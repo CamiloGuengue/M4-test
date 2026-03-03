@@ -2,58 +2,72 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Tester</title>
+  <title>Megastore</title>
   <style>
-    body { font-family: monospace; max-width: 800px; margin: 50px auto; padding: 20px; }
-    button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
-    button:hover { background: #0056b3; }
-    pre { background: #f8f9fa; padding: 20px; border-radius: 5px; max-height: 400px; overflow: auto; }
-    input { padding: 8px; margin: 5px; width: 200px; }
-    .success { color: green; }
-    .error { color: red; }
+    body { font-family: 'Segoe UI', monospace; max-width: 900px; margin: 30px auto; padding: 20px; background: #1a1a1a; color: #eee; }
+    .card { background: #252525; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333; }
+    button { padding: 10px 15px; margin: 5px; background: #00c853; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; }
+    button:hover { background: #00a443; }
+    button.alt { background: #007bff; }
+    pre { background: #000; padding: 15px; border-radius: 5px; max-height: 400px; overflow: auto; color: #00ff41; border: 1px solid #00ff41; }
+    input, textarea { padding: 10px; margin: 5px; background: #333; border: 1px solid #444; color: white; border-radius: 4px; }
+    .status-tag { font-size: 0.8em; padding: 4px 8px; border-radius: 4px; }
+    .success { background: #1b5e20; }
+    .error { background: #b71c1c; }
+    h3 { margin-top: 0; color: #00c853; border-bottom: 1px solid #333; padding-bottom: 10px; }
   </style>
 </head>
 <body>
-  <h1>Tester</h1>
+  <h1>⚡ MegaStore Tester</h1>
   
-  <h3>🔐 Autenticación</h3>
-  <input id="email" placeholder="admin@test.com" value="admin@test.com">
-  <input id="pass" type="password" placeholder="123" value="123">
-  <br>
-  <button onclick="login()">Login</button>
-  <button onclick="register()">Register ADMIN</button>
-  <button onclick="registerAgent()">Register AGENT</button>
+  <div class="card">
+    <h3>🔐 Autenticación (Supabase Auth)</h3>
+    <input id="email" placeholder="Email" value="admin@test.com">
+    <input id="pass" type="password" placeholder="Password" value="123456">
+    <br>
+    <button onclick="login()">Login</button>
+    <button onclick="register('ADMIN')" class="alt">Reg Admin</button>
+    <button onclick="register('AGENT')" class="alt">Reg Agent</button>
+    <br><br>
+    <input id="token" style="width: 90%;" placeholder="Token JWT aparecerá aquí...">
+  </div>
+
+  <div class="card">
+    <h3>🍃 Híbrido (MongoDB Atlas + SQL)</h3>
+    <p>Crea datos embebidos en Mongo vinculados al ID de Supabase:</p>
+    <input id="targetId" placeholder="ID del Usuario (UUID)">
+    <input id="bio" placeholder="Biografía corta">
+    <button onclick="setupMongoProfile()">1. Guardar en Mongo</button>
+    <button onclick="getFullProfile()" class="alt">2. Ver Perfil Híbrido</button>
+  </div>
+
+  <div class="card">
+    <h3>📊 Consultas SQL (Supabase)</h3>
+    <button onclick="getCustomers()">GET Customers</button>
+    <button onclick="getOrders()">GET Orders</button>
+    <button onclick="dbStatus()" class="alt">Check DB Status</button>
+    <button onclick="mongoStatus()" style="background:#4db33d">Check Mongo Status</button>
+  </div>
   
-  <h3>📋 Endpoints Proteger (copia token arriba)</h3>
-  <input id="token" placeholder="Bearer eyJh...">
-  <button onclick="getUsers()">GET /customers</button>
-  <button onclick="getOrders()">GET /orders</button>
-  
-  <h3>📊 Status</h3>
-  <button onclick="dbStatus()">DB Status</button>
-  
-  <h3>📄 Resultado:</h3>
-  <pre id="result">Click cualquier botón...</pre>
+  <h3>📄 Consola de Salida:</h3>
+  <pre id="result">Esperando acciones...</pre>
 
   <script>
-    let currentToken = '';
-
     async function api(url, options = {}) {
+      const resDisplay = document.getElementById('result');
       try {
-        const res = await fetch(url, {
-          headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-          },
-          ...options
-        });
+        const headers = { 'Content-Type': 'application/json' };
+        const token = document.getElementById('token').value;
+        if (token) headers['Authorization'] = token.startsWith('Bearer') ? token : `Bearer ${token}`;
+
+        const res = await fetch(url, { headers, ...options });
         const data = await res.json();
-        document.getElementById('result').innerHTML = 
-          `<span class="${res.ok ? 'success' : 'error'}">Status: ${res.status}</span>\n` +
-          JSON.stringify(data, null, 2);
+        
+        resDisplay.innerHTML = `<span class="status-tag ${res.ok ? 'success' : 'error'}">HTTP ${res.status}</span>\n` + 
+                               JSON.stringify(data, null, 2);
         return data;
-      } catch (error) {
-        document.getElementById('result').textContent = 'Error: ' + error.message;
+      } catch (err) {
+        resDisplay.textContent = '❌ Error de red: ' + err.message;
       }
     }
 
@@ -64,52 +78,45 @@
         method: 'POST',
         body: JSON.stringify({ email, password })
       });
-      if (data.token) {
-        currentToken = data.token;
-        document.getElementById('token').value = `Bearer ${data.token}`;
-      }
+      if (data.token) document.getElementById('token').value = data.token;
     }
 
-    async function register() {
-      const email = `admin${Date.now()}@test.com`;
-      const password = document.getElementById('pass').value;
+    async function register(role) {
+      const email = `user${Date.now()}@test.com`;
       await api('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify({ email, password, role: 'ADMIN' })
+        body: JSON.stringify({ email, password: '123', role })
       });
     }
 
-    async function registerAgent() {
-      const email = `agent${Date.now()}@test.com`;
-      const password = document.getElementById('pass').value;
-      await api('/api/auth/register', {
-        method: 'POST',
-        body: JSON.stringify({ email, password, role: 'AGENT' })
-      });
-    }
-
-    async function getUsers() {
-      await api('/api/sql/customers', {
-        headers: { Authorization: document.getElementById('token').value }
-      });
-    }
-    async function createCustomer() {
-      await api('/api/sql/filter',{
-         headers: { Authorization: document.getElementById('token').value }
-      });
+    // Lógica para MongoDB Atlas (Datos Embebidos)
+    async function setupMongoProfile() {
+      const supabaseId = document.getElementById('targetId').value;
+      const biografia = document.getElementById('bio').value;
       
-    }
+      // Ejemplo de datos embebidos (un array de metas)
+      const metas = [
+        { titulo: "Primer login", completada: true },
+        { titulo: "Completar perfil", completada: false }
+      ];
 
-    async function getOrders() {
-      await api('/api/sql/orders', {
-        headers: { Authorization: document.getElementById('token').value }
+      await api('/api/setup-profile', {
+        method: 'POST',
+        body: JSON.stringify({ supabaseId, biografia, metas })
       });
     }
 
-    async function dbStatus() { 
-      await api('/db-test');
+    async function getFullProfile() {
+      const id = document.getElementById('targetId').value;
+      if(!id) return alert("Pon un ID primero");
+      // Este endpoint es el que creamos que une Supabase + Mongo
+      await api(`/api/sql/customer-full-profile/${id}`);
     }
+
+    async function getCustomers() { await api('/api/sql/customers'); }
+    async function getOrders() { await api('/api/sql/orders'); }
+    async function dbStatus() { await api('/db-test'); }
+    async function mongoStatus() { await api('/mongo-test'); }
   </script>
-  
 </body>
 </html>

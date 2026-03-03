@@ -4,6 +4,19 @@ Objective
 this plataform is used no administrate products from a big store, the goal of this project is help to 
 MEGASTORE to combine his sistema, the information SQL and NOSQL in the same place.
 
+justify model 
+why embedding?
+"I decided that embedding the information was the best 
+approach because it allows for faster data access. 
+Since I am using a hybrid model, 
+I wanted to avoid potential data loading bottlenecks."
+
+normaliced process
+"A 3rd Normal Form (3NF) model was implemented, 
+which is reflected in the tables where no data 
+repetition or information redundancy is found. 
+Unnecessary dependencies were taken into account 
+to create an optimal SQL model."
 SQL (Postgres + supabase)
 
     customers
